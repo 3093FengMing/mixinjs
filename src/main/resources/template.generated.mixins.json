@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "mixinjs.generated",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "${refmap}",
+  "mixins": ${serverMixins},
+  "client": ${clientMixins},
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

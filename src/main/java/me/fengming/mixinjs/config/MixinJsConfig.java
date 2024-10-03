@@ -1,19 +1,26 @@
-package me.fengming.mixinjs.core;
+package me.fengming.mixinjs.config;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import me.fengming.mixinjs.Mixinjs;
+import me.fengming.mixinjs.Utils;
+import me.fengming.mixinjs.script.MixinScriptFile;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MixinJsConfig {
+    protected static Gson gson = new Gson();
+
     @SerializedName("id")
     private String id;
+
+    @SerializedName("refmap")
+    private String refmap;
 
     @SerializedName("mixins")
     private Mixins mixins;
@@ -26,17 +33,53 @@ public class MixinJsConfig {
         private List<String> clientMixins;
     }
 
-    public static MixinJsConfig create(Path configPath) {
-        Gson gson = new Gson();
+    private final List<MixinScriptFile> serverMixins = new ArrayList<>();
+    private final List<MixinScriptFile> clientMixins = new ArrayList<>();
+
+    public static MixinJsConfig create(String configPath) {
         try {
-            InputStream is = Files.newInputStream(configPath);
+            InputStream is = Files.newInputStream(Utils.mixinScriptPath.resolve(configPath));
             return gson.fromJson(new InputStreamReader(is), MixinJsConfig.class);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Failed to read config: ", e);
+            throw new IllegalArgumentException("Failed to read config: " + configPath, e);
         }
     }
 
     public void load() {
         Mixinjs.LOGGER.info("[MixinJs] Loading MixinJs config {}", id);
+        mixins.serverMixins.forEach(f -> serverMixins.add(new MixinScriptFile(f, false)));
+        mixins.clientMixins.forEach(f -> clientMixins.add(new MixinScriptFile(f, true)));
+        // Create mixin config
+        try {
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("template.generated.mixins.json");
+            if (is != null) {
+                byte[] bytes = is.readAllBytes();
+                String toString = new String(bytes);
+                String json = toString.replace("${refmap}", refmap)
+                        .replace("${serverMixins}", mixinsToString(serverMixins))
+                        .replace("${clientMixins}", mixinsToString(clientMixins));
+                if (Files.notExists(Utils.mixinConfigPath)) {
+                    Files.createFile(Utils.mixinConfigPath);
+                }
+                Files.writeString(Utils.mixinConfigPath, json);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[MixinJs] Failed to read template.generated.mixins.json: ", e);
+        }
     }
+
+    public void loadScripts() {
+        serverMixins.forEach(MixinScriptFile::run);
+        clientMixins.forEach(MixinScriptFile::run);
+    }
+
+    private static String mixinsToString(List<MixinScriptFile> list) {
+        if (list.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder("[");
+        list.forEach(m -> sb.append("\"").append(m.getName()).append("\", "));
+        return sb.delete(sb.length() - 2, sb.length()).append("]").toString();
+    }
+
 }

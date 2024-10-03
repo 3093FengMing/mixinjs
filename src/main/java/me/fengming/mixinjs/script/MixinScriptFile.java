@@ -1,10 +1,15 @@
 package me.fengming.mixinjs.script;
 
-public class MixinScript {
+import me.fengming.mixinjs.Mixinjs;
+import me.fengming.mixinjs.Utils;
+
+public class MixinScriptFile {
+    protected boolean isClient;
     protected String name;
 
-    public MixinScript(String scriptName) {
+    public MixinScriptFile(String scriptName, boolean isClient) {
         this.name = scriptName;
+        this.isClient = isClient;
     }
 
     public String getName() {
@@ -12,6 +17,7 @@ public class MixinScript {
     }
 
     public void run() {
-
+        Mixinjs.LOGGER.info("[MixinJs] Running mixin script: {}", name + ".js");
+        MixinScriptManager.runWithBindings(Utils.mixinScriptPath.resolve(name + ".js"), name, isClient);
     }
 }

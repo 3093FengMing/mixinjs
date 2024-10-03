@@ -4,11 +4,10 @@
   "package": "me.fengming.mixinjs.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "mixinjs.refmap.json",
-  "mixins": [
-  ],
-  "client": [
-  ],
+  "mixins": [],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "plugin": "me.fengming.mixinjs.mixin.MixinJsConfigPlugin"
 }

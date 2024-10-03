@@ -1,4 +1,4 @@
-package me.fengming.mixinjs.core;
+package me.fengming.mixinjs_coremod.core;
 
 import net.neoforged.fml.loading.FMLPaths;
 import org.objectweb.asm.ClassReader;

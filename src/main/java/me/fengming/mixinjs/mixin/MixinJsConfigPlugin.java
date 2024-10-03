@@ -1,5 +1,6 @@
 package me.fengming.mixinjs.mixin;
 
+import me.fengming.mixinjs.Mixinjs;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -7,7 +8,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.List;
 import java.util.Set;
 
-public class MixinJsPlugin implements IMixinConfigPlugin {
+public class MixinJsConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -36,7 +37,7 @@ public class MixinJsPlugin implements IMixinConfigPlugin {
 
     @Override
     public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
+        // Mixinjs.LOGGER.info("preApply: {}", mixinClassName);
     }
 
     @Override
