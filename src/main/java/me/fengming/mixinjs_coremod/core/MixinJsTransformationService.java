@@ -17,9 +17,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -125,11 +122,6 @@ public class MixinJsTransformationService implements ITransformationService {
             }
             method.instructions.set(method.instructions.get(index), new InsnNode(Opcodes.NOP));
             method.instructions.insert(method.instructions.get(index), node);
-
-            ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-            clazz.accept(cw);
-            byte[] bytes = cw.toByteArray();
-            Files.write(Path.of("F:\\test2.class"), bytes);
 
             loadClass(MIXIN_INFO, clazz);
         } catch (Throwable e) {
