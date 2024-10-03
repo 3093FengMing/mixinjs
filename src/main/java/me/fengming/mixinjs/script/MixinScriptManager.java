@@ -6,7 +6,7 @@ import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.kubejs.script.KubeJSContextFactory;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.rhino.Scriptable;
-import me.fengming.mixinjs.Mixinjs;
+import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
 import me.fengming.mixinjs.script.js.AtJS;
 import me.fengming.mixinjs.script.js.InjectorJS;
@@ -50,7 +50,7 @@ public class MixinScriptManager {
     public static Object handle(String handlerName, CallbackInfo ci, Object thisObject, Object[] args) {
         MixinHandler<?> handler = getHandler(handlerName);
         if (handler == null) {
-            Mixinjs.LOGGER.error("Script {} not found", handlerName);
+            MixinJs.LOGGER.error("Script {} not found", handlerName);
             return null;
         }
         return handler.handle(thisObject, ci, args);

@@ -23,11 +23,9 @@ import java.util.List;
 import java.util.Set;
 
 public class Utils {
-
     public static final MixinScriptManager clientScriptManager = new MixinScriptManager.Client();
     public static final MixinScriptManager serverScriptManager = new MixinScriptManager.Server();
 
-    public static final String generatedMixins = "mixinjs/generated/";
     public static final Path mixinClassPath = FMLPaths.GAMEDIR.get().resolve(".mixinjs");
     public static final Path mixinScriptPath = FMLPaths.GAMEDIR.get().resolve("kubejs").resolve("mixin_scripts");
     public static final Path configPath = mixinScriptPath.resolve("mixins.config.json");
@@ -56,7 +54,7 @@ public class Utils {
             ClassReader cr = new ClassReader(className);
             ClassNode cn = new ClassNode();
             cr.accept(cn, 0);
-            Mixinjs.LOGGER.info("{}", cn.methods.stream().map(c -> c.name).toList());
+            MixinJs.LOGGER.info("{}", cn.methods.stream().map(c -> c.name).toList());
             return cn;
         } catch (Exception e) {
             throw new IllegalArgumentException("Not found class: " + className, e);
@@ -79,7 +77,7 @@ public class Utils {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        Mixinjs.LOGGER.info("{}", set.stream().filter(c -> c.startsWith("dev.latvian")).toList());
+        MixinJs.LOGGER.info("{}", set.stream().filter(c -> c.startsWith("dev.latvian")).toList());
         return set;
     }
 
@@ -91,7 +89,7 @@ public class Utils {
             }
             Files.write(path, bytes);
         } catch (IOException e) {
-            Mixinjs.LOGGER.info("Failed to write generated mixin class: " + name, e);
+            MixinJs.LOGGER.info("Failed to write generated mixin class: " + name, e);
         }
     }
 

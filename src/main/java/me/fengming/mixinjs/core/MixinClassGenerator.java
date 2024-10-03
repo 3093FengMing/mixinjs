@@ -1,6 +1,6 @@
 package me.fengming.mixinjs.core;
 
-import me.fengming.mixinjs.Mixinjs;
+import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
 import me.fengming.mixinjs.script.js.MixinBuilderJS;
 import me.fengming.mixinjs.script.js.MixinMethod;
@@ -48,7 +48,7 @@ public class MixinClassGenerator {
     }
 
     public static void generate(MixinBuilderJS builder) {
-        Mixinjs.LOGGER.info("[MixinJs] Generating mixin class: {}", builder.target);
+        MixinJs.LOGGER.info("[MixinJs] Generating mixin class: {}", builder.target);
 
         String className = MIXIN_PACKAGE + builder.id;
         String target = builder.target;

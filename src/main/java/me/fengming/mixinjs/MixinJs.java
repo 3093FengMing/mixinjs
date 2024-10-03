@@ -5,14 +5,14 @@ import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Mod(Mixinjs.MODID)
-public class Mixinjs {
+@Mod(MixinJs.MODID)
+public class MixinJs {
     public static final String MODID = "mixinjs";
     public static final Logger LOGGER = LoggerFactory.getLogger("MixinJs");
 
     public static MixinJsConfig config = null;
 
-    public Mixinjs() {
+    public MixinJs() {
 
     }
 }

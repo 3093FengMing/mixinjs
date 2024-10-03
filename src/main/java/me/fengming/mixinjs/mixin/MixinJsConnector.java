@@ -1,6 +1,6 @@
 package me.fengming.mixinjs.mixin;
 
-import me.fengming.mixinjs.Mixinjs;
+import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
 import me.fengming.mixinjs.config.MixinJsConfig;
 import org.spongepowered.asm.mixin.Mixins;
@@ -12,21 +12,21 @@ import java.nio.file.Files;
 public class MixinJsConnector implements IMixinConnector {
     @Override
     public void connect() {
-        Mixinjs.LOGGER.info("[MixinJsConnector] Connected to Mixin.");
+        MixinJs.LOGGER.info("[MixinJsConnector] Connected to Mixin.");
         if (Files.notExists(Utils.configPath)) {
             try {
                 Files.createDirectories(Utils.mixinScriptPath);
                 Files.createFile(Utils.configPath);
-                writeTestConfig();
+                // writeTestConfig();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
         // Load mixins config
-        Mixinjs.config = MixinJsConfig.create("mixins.config.json");
-        Mixinjs.config.load();
+        MixinJs.config = MixinJsConfig.create("mixins.config.json");
+        MixinJs.config.load();
         // Generate and load mixin class
-        Mixinjs.config.loadScripts();
+        MixinJs.config.loadScripts();
         // Load mixin
         Mixins.addConfiguration(Utils.mixinConfigPath.toString());
     }

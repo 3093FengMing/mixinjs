@@ -105,6 +105,7 @@ tasks.register("buildCoreMod") {
     jar {
         exclude "me/fengming/mixinjs"
         exclude "assets"
+        exclude "template.generated.mixins.json"
         exclude "mixinjs.mixins.json"
         exclude "META-INF/MANIFEST.MF"
         exclude "META-INF/neoforge.mods.toml"

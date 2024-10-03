@@ -1,6 +1,6 @@
 package me.fengming.mixinjs.script;
 
-import me.fengming.mixinjs.Mixinjs;
+import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
 
 public class MixinScriptFile {
@@ -17,7 +17,7 @@ public class MixinScriptFile {
     }
 
     public void run() {
-        Mixinjs.LOGGER.info("[MixinJs] Running mixin script: {}", name + ".js");
+        MixinJs.LOGGER.info("[MixinJs] Running mixin script: {}", name + ".js");
         MixinScriptManager.runWithBindings(Utils.mixinScriptPath.resolve(name + ".js"), name, isClient);
     }
 }

@@ -2,7 +2,7 @@ package me.fengming.mixinjs.config;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-import me.fengming.mixinjs.Mixinjs;
+import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
 import me.fengming.mixinjs.script.MixinScriptFile;
 
@@ -39,14 +39,17 @@ public class MixinJsConfig {
     public static MixinJsConfig create(String configPath) {
         try {
             InputStream is = Files.newInputStream(Utils.mixinScriptPath.resolve(configPath));
-            return gson.fromJson(new InputStreamReader(is), MixinJsConfig.class);
+            // MixinJs.LOGGER.info("mixinconfig: {}", Files.readString(Utils.mixinScriptPath.resolve(configPath)));
+            MixinJsConfig cfg = gson.fromJson(new InputStreamReader(is), MixinJsConfig.class);
+            if (cfg == null) throw new IllegalArgumentException("Failed to read config: " + configPath);
+            return cfg;
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to read config: " + configPath, e);
         }
     }
 
     public void load() {
-        Mixinjs.LOGGER.info("[MixinJs] Loading MixinJs config {}", id);
+        MixinJs.LOGGER.info("[MixinJs] Loading MixinJs config {}", id);
         mixins.serverMixins.forEach(f -> serverMixins.add(new MixinScriptFile(f, false)));
         mixins.clientMixins.forEach(f -> clientMixins.add(new MixinScriptFile(f, true)));
         // Create mixin config
