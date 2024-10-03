@@ -5,7 +5,6 @@ import dev.latvian.mods.kubejs.client.ClientScriptManager;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.kubejs.script.KubeJSContextFactory;
 import dev.latvian.mods.kubejs.script.ScriptManager;
-import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.Scriptable;
 import me.fengming.mixinjs.Mixinjs;
 import me.fengming.mixinjs.Utils;
@@ -32,6 +31,7 @@ public class MixinScriptManager {
         this.scriptManager = scriptManager;
         this.context = (KubeJSContext) new KubeJSContextFactory(scriptManager).enter();
         this.topScope = context.topLevelScope;
+        context.addToScope(topScope, "console", context.getType().console);
         context.addToScope(topScope, "Mixins", MixinsJS.class);
         context.addToScope(topScope, "Injector", InjectorJS.class);
         context.addToScope(topScope, "At", AtJS.class);

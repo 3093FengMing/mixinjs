@@ -8,9 +8,6 @@ import org.objectweb.asm.*;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.Inject;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 
@@ -131,16 +128,15 @@ public class MixinClassGenerator {
             mv.visitLabel(label2);
             mv.visitLocalVariable("this", strRef2desc(thisClass), null, label0, label2, 0);
             // Load method params
-            for (int i = 0; i < params.size(); i++) {
-                int ii = i + 1;
-                mv.visitLocalVariable("arg" + ii, params.get(i), null, label0, label2, ii);
+            for (int i = 1; i < params.size(); i++) {
+                mv.visitLocalVariable("arg" + i, params.get(i), null, label0, label2, i);
             }
-//            // Load ci/cir
-//            if (returnValue.equals("V")) {
-//                mv.visitLocalVariable("cir", CIR, CIRG.replace("{G}", returnValue), label0, label2, paramsCount + 1);
-//            } else {
-//                mv.visitLocalVariable("ci", CI, null, label0, label2, paramsCount + 1);
-//            }
+            // Load ci/cir
+            if (returnValue.equals("V")) {
+                mv.visitLocalVariable("cir", CIR, CIRG.replace("{G}", returnValue), label0, label2, paramsCount + 1);
+            } else {
+                mv.visitLocalVariable("ci", CI, null, label0, label2, paramsCount + 1);
+            }
             mv.visitMaxs(0, 0); // ignored
             mv.visitEnd();
         }

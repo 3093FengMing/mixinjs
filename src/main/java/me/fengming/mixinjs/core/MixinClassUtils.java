@@ -1,6 +1,5 @@
 package me.fengming.mixinjs.core;
 
-import me.fengming.mixinjs.Mixinjs;
 import me.fengming.mixinjs.script.MixinScriptManager;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
