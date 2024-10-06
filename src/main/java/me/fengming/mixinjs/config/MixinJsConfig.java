@@ -1,6 +1,5 @@
 package me.fengming.mixinjs.config;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
@@ -14,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MixinJsConfig {
-    protected static Gson gson = new Gson();
-
     @SerializedName("id")
     private String id;
 
@@ -40,7 +37,7 @@ public class MixinJsConfig {
         try {
             InputStream is = Files.newInputStream(Utils.mixinScriptPath.resolve(configPath));
             // MixinJs.LOGGER.info("mixinconfig: {}", Files.readString(Utils.mixinScriptPath.resolve(configPath)));
-            MixinJsConfig cfg = gson.fromJson(new InputStreamReader(is), MixinJsConfig.class);
+            MixinJsConfig cfg = Utils.GSON.fromJson(new InputStreamReader(is), MixinJsConfig.class);
             if (cfg == null) throw new IllegalArgumentException("Failed to read config: " + configPath);
             return cfg;
         } catch (IOException e) {
@@ -65,6 +62,7 @@ public class MixinJsConfig {
                     Files.createFile(Utils.mixinConfigPath);
                 }
                 Files.writeString(Utils.mixinConfigPath, json);
+                is.close();
             }
         } catch (Exception e) {
             throw new IllegalArgumentException("[MixinJs] Failed to read template.generated.mixins.json: ", e);

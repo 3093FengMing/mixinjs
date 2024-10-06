@@ -6,6 +6,7 @@ import me.fengming.mixinjs.script.MixinScriptManager;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class MixinBuilderJS {
     public final String id;
     public final String target;
@@ -28,6 +29,6 @@ public class MixinBuilderJS {
 
     public static String getHandlerName(MixinMethod m) {
         // handler_init_Inject_RETURN
-        return "handler_" + m.target() + "_" + m.injector().name + "_" + m.injector().at.value();
+        return "handler_" + m.target() + "_" + m.injector().name + "_" + m.injector().at.value;
     }
 }

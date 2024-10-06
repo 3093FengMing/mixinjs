@@ -1,6 +1,7 @@
 package me.fengming.mixinjs.script.js;
 
-public record AtJS(String value) {
+@SuppressWarnings("unused")
+public class AtJS {
     public static final AtJS HEAD = new AtJS("HEAD");
     public static final AtJS RETURN = new AtJS("RETURN");
     public static final AtJS TAIL = new AtJS("TAIL");
@@ -11,4 +12,17 @@ public record AtJS(String value) {
     public static final AtJS INVOKE_STRING = new AtJS("INVOKE_STRING");
     public static final AtJS JUMP = new AtJS("JUMP");
     public static final AtJS CONSTANT = new AtJS("CONSTANT");
+
+    public final String value;
+    public String target;
+
+    public AtJS(String value) {
+        this.value = value;
+    }
+
+    public AtJS target(String target) {
+        this.target = target;
+        return this;
+    }
+
 }

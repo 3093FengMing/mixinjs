@@ -13,4 +13,8 @@ public class MixinClassUtils {
     public static void runScript(String scriptName, CallbackInfo ci, Object thisObject, Object... args) {
         MixinScriptManager.handle(scriptName, ci, thisObject, args);
     }
+
+//    public void test(Object arg, CallbackInfo ci) {
+//        MixinClassUtils.runScript("test", ci, this, arg);
+//    }
 }

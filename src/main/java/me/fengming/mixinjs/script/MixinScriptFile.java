@@ -18,6 +18,6 @@ public class MixinScriptFile {
 
     public void run() {
         MixinJs.LOGGER.info("[MixinJs] Running mixin script: {}", name + ".js");
-        MixinScriptManager.runWithBindings(Utils.mixinScriptPath.resolve(name + ".js"), name, isClient);
+        MixinScriptManager.runWithBindings(Utils.mixinScriptPath.resolve(name + ".js"), name);
     }
 }

@@ -1,6 +1,6 @@
 package me.fengming.mixinjs;
 
-import me.fengming.mixinjs.script.MixinScriptManager;
+import com.google.gson.Gson;
 import net.neoforged.fml.loading.FMLPaths;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -22,14 +22,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings({"deprecation", "unchecked"})
 public class Utils {
-    public static final MixinScriptManager clientScriptManager = new MixinScriptManager.Client();
-    public static final MixinScriptManager serverScriptManager = new MixinScriptManager.Server();
+    public static Gson GSON = new Gson();
 
     public static final Path mixinClassPath = FMLPaths.GAMEDIR.get().resolve(".mixinjs");
     public static final Path mixinScriptPath = FMLPaths.GAMEDIR.get().resolve("kubejs").resolve("mixin_scripts");
     public static final Path configPath = mixinScriptPath.resolve("mixins.config.json");
     public static final Path mixinConfigPath = mixinScriptPath.resolve("generated.mixins.json");
+
+    public static final Path modConfigPath = FMLPaths.GAMEDIR.get().resolve("kubejs").resolve("config").resolve("mixinjs-settings.json");
 
     public static final IMixinService mixinService = MixinService.getService();
 
@@ -77,7 +79,6 @@ public class Utils {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        MixinJs.LOGGER.info("{}", set.stream().filter(c -> c.startsWith("dev.latvian")).toList());
         return set;
     }
 
@@ -89,7 +90,7 @@ public class Utils {
             }
             Files.write(path, bytes);
         } catch (IOException e) {
-            MixinJs.LOGGER.info("Failed to write generated mixin class: " + name, e);
+            MixinJs.LOGGER.info("Failed to write generated mixin class: {}", name, e);
         }
     }
 
