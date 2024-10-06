@@ -20,18 +20,12 @@ public class MixinJsConfig {
     private String refmap;
 
     @SerializedName("mixins")
-    private Mixins mixins;
+    private List<String> mixins;
 
-    private static class Mixins {
-        @SerializedName("server")
-        private List<String> serverMixins;
+    private final List<MixinScriptFile> mixinScriptFiles = new ArrayList<>();
 
-        @SerializedName("client")
-        private List<String> clientMixins;
-    }
-
-    private final List<MixinScriptFile> serverMixins = new ArrayList<>();
-    private final List<MixinScriptFile> clientMixins = new ArrayList<>();
+    private final List<String> serverMixinClasses = new ArrayList<>();
+    private final List<String> clientMixinClasses = new ArrayList<>();
 
     public static MixinJsConfig create(String configPath) {
         try {
@@ -47,8 +41,11 @@ public class MixinJsConfig {
 
     public void load() {
         MixinJs.LOGGER.info("[MixinJs] Loading MixinJs config {}", id);
-        mixins.serverMixins.forEach(f -> serverMixins.add(new MixinScriptFile(f, false)));
-        mixins.clientMixins.forEach(f -> clientMixins.add(new MixinScriptFile(f, true)));
+        mixins.forEach(f -> mixinScriptFiles.add(new MixinScriptFile(f)));
+        loadScripts();
+    }
+
+    public void writeMixinConfig() {
         // Create mixin config
         try {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream("template.generated.mixins.json");
@@ -56,8 +53,8 @@ public class MixinJsConfig {
                 byte[] bytes = is.readAllBytes();
                 String toString = new String(bytes);
                 String json = toString.replace("${refmap}", refmap)
-                        .replace("${serverMixins}", mixinsToString(serverMixins))
-                        .replace("${clientMixins}", mixinsToString(clientMixins));
+                        .replace("${serverMixins}", mixinsToString(clientMixinClasses))
+                        .replace("${clientMixins}", mixinsToString(serverMixinClasses));
                 if (Files.notExists(Utils.mixinConfigPath)) {
                     Files.createFile(Utils.mixinConfigPath);
                 }
@@ -70,17 +67,23 @@ public class MixinJsConfig {
     }
 
     public void loadScripts() {
-        serverMixins.forEach(MixinScriptFile::run);
-        clientMixins.forEach(MixinScriptFile::run);
+        mixinScriptFiles.forEach(MixinScriptFile::run);
     }
 
-    private static String mixinsToString(List<MixinScriptFile> list) {
+    public void putMixinClass(String className, boolean isClient) {
+        if (isClient) {
+            clientMixinClasses.add(className);
+        } else {
+            serverMixinClasses.add(className);
+        }
+    }
+
+    private static String mixinsToString(List<String> list) {
         if (list.isEmpty()) {
             return "[]";
         }
         StringBuilder sb = new StringBuilder("[");
-        list.forEach(m -> sb.append("\"").append(m.getName()).append("\", "));
+        list.forEach(s -> sb.append("\"").append(s).append("\", "));
         return sb.delete(sb.length() - 2, sb.length()).append("]").toString();
     }
-
 }

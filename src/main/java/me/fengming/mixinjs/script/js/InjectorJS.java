@@ -8,15 +8,15 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class InjectorJS {
-    public static final Map<String, Class<?>> injectorsMap = new HashMap<>();
+    protected static final Map<String, InjectorJS> injectorsMap = new HashMap<>();
+    protected static final Set<String> ciSets = new HashSet<>();
 
-    public final String name;
+    protected AtFlag atFlag;
+
     public final String className;
     public String target;
     public boolean cancellable = false;
@@ -24,38 +24,38 @@ public class InjectorJS {
 
     static {
         // SpongePowered Mixin
-        injectorsMap.put("overwrite", Overwrite.class);
-        injectorsMap.put("inject", Inject.class);
-        injectorsMap.put("redirect", Redirect.class);
-        injectorsMap.put("modifyarg", ModifyArg.class);
-        injectorsMap.put("modifyargs", ModifyArgs.class);
-        injectorsMap.put("modifyvariable", ModifyVariable.class);
-        injectorsMap.put("modifyconstant", ModifyConstant.class);
-        injectorsMap.put("modify_arg", ModifyArg.class);
-        injectorsMap.put("modify_args", ModifyArgs.class);
-        injectorsMap.put("modify_variable", ModifyVariable.class);
-        injectorsMap.put("modify_constant", ModifyConstant.class);
+        injectorsMap.put("overwrite", new InjectorJS(Overwrite.class.getName(), AtFlag.NO_AT));
+        injectorsMap.put("inject", new InjectorJS(Inject.class.getName(), AtFlag.MULTI));
+        injectorsMap.put("redirect", new InjectorJS(Redirect.class.getName(), AtFlag.SINGLE));
+        injectorsMap.put("modifyarg", new InjectorJS(ModifyArg.class.getName(), AtFlag.SINGLE));
+        injectorsMap.put("modifyargs", new InjectorJS(ModifyArgs.class.getName(), AtFlag.SINGLE));
+        injectorsMap.put("modifyvariable", new InjectorJS(ModifyVariable.class.getName(), AtFlag.SINGLE));
+        injectorsMap.put("modifyconstant", new InjectorJS(ModifyConstant.class.getName(), AtFlag.NO_AT));
+        injectorsMap.put("modify_arg", new InjectorJS(ModifyArg.class.getName(), AtFlag.SINGLE));
+        injectorsMap.put("modify_args", new InjectorJS(ModifyArgs.class.getName(), AtFlag.SINGLE));
+        injectorsMap.put("modify_variable", new InjectorJS(ModifyVariable.class.getName(), AtFlag.SINGLE));
+        injectorsMap.put("modify_constant", new InjectorJS(ModifyConstant.class.getName(), AtFlag.NO_AT));
         // Mixin Extras
-        injectorsMap.put("modifyexpressionvalue", ModifyExpressionValue.class);
-        injectorsMap.put("modifyreceiver", ModifyReceiver.class);
-        injectorsMap.put("modifyreturnvalue", ModifyReturnValue.class);
-        injectorsMap.put("wrapoperation", WrapOperation.class);
-        injectorsMap.put("wrapmethod", WrapMethod.class);
-        injectorsMap.put("modify_expression_value", ModifyExpressionValue.class);
-        injectorsMap.put("modify_receiver", ModifyReceiver.class);
-        injectorsMap.put("modify_return_value", ModifyReturnValue.class);
-        injectorsMap.put("wrap_operation", WrapOperation.class);
-        injectorsMap.put("wrap_method", WrapMethod.class);
+        injectorsMap.put("modifyexpressionvalue", new InjectorJS(ModifyExpressionValue.class.getName(), AtFlag.MULTI));
+        injectorsMap.put("modifyreceiver", new InjectorJS(ModifyReceiver.class.getName(), AtFlag.MULTI));
+        injectorsMap.put("modifyreturnvalue", new InjectorJS(ModifyReturnValue.class.getName(), AtFlag.MULTI));
+        injectorsMap.put("wrapoperation", new InjectorJS(WrapOperation.class.getName(), AtFlag.MULTI));
+        injectorsMap.put("wrapmethod", new InjectorJS(WrapMethod.class.getName(), AtFlag.NO_AT));
+        injectorsMap.put("modify_expression_value", new InjectorJS(ModifyExpressionValue.class.getName(), AtFlag.MULTI));
+        injectorsMap.put("modify_receiver", new InjectorJS(ModifyReceiver.class.getName(), AtFlag.MULTI));
+        injectorsMap.put("modify_return_value", new InjectorJS(ModifyReturnValue.class.getName(), AtFlag.MULTI));
+        injectorsMap.put("wrap_operation", new InjectorJS(WrapOperation.class.getName(), AtFlag.MULTI));
+        injectorsMap.put("wrap_method", new InjectorJS(WrapMethod.class.getName(), AtFlag.NO_AT));
     }
 
-    protected InjectorJS(String name, String className) {
+    protected InjectorJS(String className, AtFlag atFlag) {
         Objects.requireNonNull(className);
-        this.name = name;
         this.className = className;
+        this.atFlag = atFlag;
     }
 
     public static InjectorJS build(String name) {
-        return new InjectorJS(name.toLowerCase(), injectorsMap.getOrDefault(name, null).getName());
+        return injectorsMap.get(name);
     }
 
     public InjectorJS target(String target) {
@@ -71,5 +71,22 @@ public class InjectorJS {
     public InjectorJS at(AtJS at) {
         this.at = at;
         return this;
+    }
+
+    public boolean hasCI() {
+        return Inject.class.getName().equals(className);
+    }
+
+    public boolean isMultiAt() {
+        return atFlag == AtFlag.MULTI;
+    }
+
+    @Override
+    public String toString() {
+        return className.substring(className.lastIndexOf('.') + 1);
+    }
+
+    public enum AtFlag {
+        MULTI, SINGLE, NO_AT
     }
 }

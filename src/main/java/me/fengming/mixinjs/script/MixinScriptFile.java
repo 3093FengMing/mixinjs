@@ -4,12 +4,10 @@ import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
 
 public class MixinScriptFile {
-    protected boolean isClient;
     protected String name;
 
-    public MixinScriptFile(String scriptName, boolean isClient) {
+    public MixinScriptFile(String scriptName) {
         this.name = scriptName;
-        this.isClient = isClient;
     }
 
     public String getName() {
