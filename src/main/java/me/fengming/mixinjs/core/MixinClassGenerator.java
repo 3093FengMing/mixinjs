@@ -104,7 +104,7 @@ public class MixinClassGenerator {
             // thisObject
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             // args
-            visitMutableInt(mv, paramsCount);
+            visitMutableInt(mv, injector.hasCI() ? paramsCount : paramsCount + 1);
             mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
             if (paramsCount != 0) {
                 visitParamsArray(mv, params, withReturn);

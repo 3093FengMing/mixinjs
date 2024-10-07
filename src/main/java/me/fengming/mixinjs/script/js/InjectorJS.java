@@ -49,7 +49,6 @@ public class InjectorJS {
     }
 
     protected InjectorJS(String className, AtFlag atFlag) {
-        Objects.requireNonNull(className);
         this.className = className;
         this.atFlag = atFlag;
     }

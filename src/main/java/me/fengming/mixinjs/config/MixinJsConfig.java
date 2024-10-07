@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
 import me.fengming.mixinjs.script.MixinScriptFile;
+import me.fengming.mixinjs.script.MixinScriptManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,8 +23,6 @@ public class MixinJsConfig {
     @SerializedName("mixins")
     private List<String> mixins;
 
-    private final List<MixinScriptFile> mixinScriptFiles = new ArrayList<>();
-
     private final List<String> serverMixinClasses = new ArrayList<>();
     private final List<String> clientMixinClasses = new ArrayList<>();
 
@@ -41,8 +40,8 @@ public class MixinJsConfig {
 
     public void load() {
         MixinJs.LOGGER.info("[MixinJs] Loading MixinJs config {}", id);
-        mixins.forEach(f -> mixinScriptFiles.add(new MixinScriptFile(f)));
-        loadScripts();
+        mixins.forEach(f -> MixinScriptManager.mixinScriptFiles.add(new MixinScriptFile(f)));
+        MixinScriptManager.loadScript();
     }
 
     public void writeMixinConfig() {
@@ -64,10 +63,6 @@ public class MixinJsConfig {
         } catch (Exception e) {
             throw new IllegalArgumentException("[MixinJs] Failed to read template.generated.mixins.json: ", e);
         }
-    }
-
-    public void loadScripts() {
-        mixinScriptFiles.forEach(MixinScriptFile::run);
     }
 
     public void putMixinClass(String className, boolean isClient) {

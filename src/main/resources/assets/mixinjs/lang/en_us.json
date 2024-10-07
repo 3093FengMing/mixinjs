@@ -1,0 +1,4 @@
+{
+  "commands.mixinjs.reload.success": "Reloaded MixinJs Scripts!",
+  "commands.mixinjs.reload.error": "Failed to reload MixinJs scripts!"
+}

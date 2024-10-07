@@ -19,32 +19,47 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MixinScriptManager {
+    public static final List<MixinScriptFile> mixinScriptFiles = new ArrayList<>();
 
-    protected static Context defaultContext = new ContextFactory().enter();
-    protected static Scriptable defaultScope = defaultContext.initSafeStandardObjects();
+    protected static Context defaultContext;
+    protected static Scriptable defaultScope;
 
     private static boolean kubeLoaded = false;
     private static final HashMap<String, MixinHandler<?>> handlers = new HashMap<>();
 
-    static {
-        MixinJsJavaWrapper.init(defaultContext);
-        defaultContext.addToScope(defaultScope, "Logger", MixinJs.LOGGER);
-        defaultContext.addToScope(defaultScope, "JavaWrapper", MixinJsJavaWrapper.INSTANCE);
-        defaultContext.addToScope(defaultScope, "Mixins", MixinsJS.class);
-        defaultContext.addToScope(defaultScope, "Injector", InjectorJS.class);
-        defaultContext.addToScope(defaultScope, "At", AtJS.class);
+    public static void load() {
+        defaultContext = new ContextFactory().enter();
+        defaultScope = defaultContext.initSafeStandardObjects();
+        addBindings(defaultContext, defaultScope);
     }
 
-    public static void runWithBindings(Path scriptPath, String name) {
+    public static void addBindings(Context context, Scriptable scope) {
+        MixinJsJavaWrapper.init(context);
+        context.addToScope(scope, "Logger", MixinJs.LOGGER);
+        context.addToScope(scope, "JavaWrapper", MixinJsJavaWrapper.INSTANCE);
+        context.addToScope(scope, "Mixins", MixinsJS.class);
+        context.addToScope(scope, "Injector", InjectorJS.class);
+        context.addToScope(scope, "At", AtJS.class);
+    }
+
+    public static void loadScript() throws RuntimeException {
+        load();
+        mixinScriptFiles.forEach(MixinScriptFile::run);
+    }
+
+    public static void runWithBindings(Path scriptPath, String name) throws RuntimeException {
         // run scripts to add custom mixin to Mixins
         try {
             InputStreamReader isr = new InputStreamReader(Files.newInputStream(scriptPath), StandardCharsets.UTF_8);
             defaultContext.evaluateReader(defaultScope, isr, name, 1, null);
         } catch (IOException e) {
             MixinJs.LOGGER.error("Failed to run script: {}", name, e);
+            throw new RuntimeException(); // trigger reload command
         }
     }
 

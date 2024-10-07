@@ -14,7 +14,7 @@ public class MixinScriptFile {
         return this.name;
     }
 
-    public void run() {
+    public void run() throws RuntimeException {
         MixinJs.LOGGER.info("[MixinJs] Running mixin script: {}", name + ".js");
         MixinScriptManager.runWithBindings(Utils.mixinScriptPath.resolve(name + ".js"), name);
     }

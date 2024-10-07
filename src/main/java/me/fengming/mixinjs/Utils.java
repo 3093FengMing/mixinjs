@@ -27,11 +27,9 @@ public class Utils {
     public static Gson GSON = new Gson();
 
     public static final Path mixinClassPath = FMLPaths.GAMEDIR.get().resolve(".mixinjs");
-    public static final Path mixinScriptPath = FMLPaths.GAMEDIR.get().resolve("kubejs").resolve("mixin_scripts");
+    public static final Path mixinScriptPath = FMLPaths.GAMEDIR.get().resolve("mixinjs");
     public static final Path configPath = mixinScriptPath.resolve("mixins.config.json");
     public static final Path mixinConfigPath = mixinScriptPath.resolve("generated.mixins.json");
-
-    public static final Path modConfigPath = FMLPaths.GAMEDIR.get().resolve("kubejs").resolve("config").resolve("mixinjs-settings.json");
 
     public static final IMixinService mixinService = MixinService.getService();
 
