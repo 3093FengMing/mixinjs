@@ -15,6 +15,7 @@ public class MixinClassGenerator {
     protected static final String MIXIN_PACKAGE = "mixinjs/generated/";
 
     protected static final String CI = "Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;";
+    protected static final String CIR = "Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;";
 
     public static void generate(MixinBuilderJS builder) {
         MixinJs.LOGGER.info("[MixinJs] Generating mixin class: {} for {}", builder.id, builder.target);
@@ -56,19 +57,27 @@ public class MixinClassGenerator {
         boolean withReturn = !returnValue.equals("V");
         params.removeLast();
         int paramsCount = params.size() - 1;
-
+        int callbackInfoIndex = params.size();
+        for (int i = 0; i < params.size(); i++) {
+            String s = params.get(i);
+            if (CI.equals(s) || CIR.equals(s)) {
+                callbackInfoIndex = i + 1;
+                break;
+            }
+        }
 
         // Visit mixin method annotation
         mv = cw.visitMethod(Opcodes.ACC_PRIVATE | (method.isStatic() ? Opcodes.ACC_STATIC : 0), handlerName,
                 method.desc(), null, null);
         {
-            // @Inject like
             {
                 av0 = mv.visitAnnotation(strRef2desc(Utils.rawPackage(annotationType)), true);
                 AnnotationVisitor av1 = av0.visitArray("method");
                 av1.visit(null, injector.target);
                 av1.visitEnd();
-                av0.visit("cancellable", injector.cancellable);
+                if (injector.isCancellable()) {
+                    av0.visit("cancellable", true);
+                }
             }
             // @At
             {
@@ -97,7 +106,7 @@ public class MixinClassGenerator {
             mv.visitLdcInsn(handlerName);
             // callbackInfo
             if (injector.hasCI()) {
-                mv.visitVarInsn(Opcodes.ALOAD, paramsCount + 1);
+                mv.visitVarInsn(Opcodes.ALOAD, callbackInfoIndex);
             } else {
                 mv.visitInsn(Opcodes.ACONST_NULL);
             }
@@ -107,7 +116,7 @@ public class MixinClassGenerator {
             visitMutableInt(mv, injector.hasCI() ? paramsCount : paramsCount + 1);
             mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
             if (paramsCount != 0) {
-                visitParamsArray(mv, params, withReturn);
+                visitParamsArray(mv, params);
             }
             // call runScript
             if (withReturn) {
@@ -127,7 +136,7 @@ public class MixinClassGenerator {
             }
             if (injector.hasCI()) {
                 // Load ci, don't worry about CallbackInfoReturnable, as Mixin will automatically cast it
-                mv.visitLocalVariable("ci", CI, null, label0, label2, paramsCount + 1);
+                mv.visitLocalVariable("ci", CI, null, label0, label2, callbackInfoIndex);
             }
             mv.visitMaxs(0, 0); // ignored
             mv.visitEnd();
@@ -147,9 +156,9 @@ public class MixinClassGenerator {
         }
     }
 
-    private static void visitParamsArray(MethodVisitor mv, List<String> params, boolean includeLast) {
-        int l = includeLast ? params.size() : params.size() - 1;
-        for (int i = 0; i < l; i++) {
+    private static void visitParamsArray(MethodVisitor mv, List<String> params) {
+        // include CallbackInfo in order to capture locals
+        for (int i = 0; i < params.size(); i++) {
             String p = params.get(i);
             Type type = Type.getType(p);
             mv.visitInsn(Opcodes.DUP);

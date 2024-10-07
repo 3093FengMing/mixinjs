@@ -54,7 +54,7 @@ public class Utils {
             ClassReader cr = new ClassReader(className);
             ClassNode cn = new ClassNode();
             cr.accept(cn, 0);
-            MixinJs.LOGGER.info("{}", cn.methods.stream().map(c -> c.name).toList());
+            // MixinJs.LOGGER.info("{}", cn.methods.stream().map(c -> c.name).toList());
             return cn;
         } catch (Exception e) {
             throw new IllegalArgumentException("Not found class: " + className, e);
@@ -69,11 +69,10 @@ public class Utils {
         IClassTracker tracker = mixinService.getClassTracker();
         Set<String> set = Set.of();
         try {
-            if (tracker instanceof ModLauncherClassTracker mlct) {
-                Field Field_loadedClasses = mlct.getClass().getDeclaredField("loadedClasses");
-                Field_loadedClasses.setAccessible(true);
-                set = (Set<String>) Field_loadedClasses.get(mlct);
-            }
+            if (!(tracker instanceof ModLauncherClassTracker mlct)) return set;
+            Field Field_loadedClasses = mlct.getClass().getDeclaredField("loadedClasses");
+            Field_loadedClasses.setAccessible(true);
+            set = (Set<String>) Field_loadedClasses.get(mlct);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

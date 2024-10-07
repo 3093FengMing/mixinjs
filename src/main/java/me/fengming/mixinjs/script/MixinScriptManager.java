@@ -33,9 +33,12 @@ public class MixinScriptManager {
     private static final HashMap<String, MixinHandler<?>> handlers = new HashMap<>();
 
     public static void load() {
+        // script manager
         defaultContext = new ContextFactory().enter();
         defaultScope = defaultContext.initSafeStandardObjects();
         addBindings(defaultContext, defaultScope);
+        // scripts
+        InjectorJS.load();
     }
 
     public static void addBindings(Context context, Scriptable scope) {
