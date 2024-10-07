@@ -4,7 +4,9 @@ import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.ContextFactory;
+import dev.latvian.mods.rhino.NativeJavaArray;
 import dev.latvian.mods.rhino.Scriptable;
+import dev.latvian.mods.rhino.type.TypeInfo;
 import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
 import me.fengming.mixinjs.script.js.AtJS;
@@ -85,7 +87,12 @@ public class MixinScriptManager {
                 defaultContext.setTopCall(kubeContext.topLevelScope);
             }
         }
-        return handler.handle(thisObject, ci, args);
+        try {
+            return handler.handle(thisObject, ci, defaultContext.wrap(defaultScope, args, TypeInfo.OBJECT_ARRAY));
+        } catch (Exception e) {
+            MixinJs.LOGGER.error("Failed to handle {}: ", handlerName, e);
+        }
+        return null;
     }
 
     public static MixinHandler<?> addHandler(String handlerName, MixinHandler<?> handler) {

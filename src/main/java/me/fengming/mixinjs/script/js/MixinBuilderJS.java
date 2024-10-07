@@ -20,8 +20,8 @@ public class MixinBuilderJS {
         this.target = target;
     }
 
-    public MixinBuilderJS method(String target, InjectorJS injector, MixinHandler<?> caller, String desc, boolean isStatic) {
-        methods.add(new MixinMethod(target, injector, caller, desc, isStatic));
+    public MixinBuilderJS method(String target, InjectorJS injector, MixinHandler<?> handler, String desc, boolean isStatic) {
+        methods.add(new MixinMethod(target, injector, handler, desc, isStatic));
         return this;
     }
 

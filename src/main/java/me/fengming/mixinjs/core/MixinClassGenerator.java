@@ -56,15 +56,16 @@ public class MixinClassGenerator {
         String returnValue = params.getLast();
         boolean withReturn = !returnValue.equals("V");
         params.removeLast();
-        int paramsCount = params.size() - 1;
+        int paramsCount = params.size();
         int callbackInfoIndex = params.size();
         for (int i = 0; i < params.size(); i++) {
             String s = params.get(i);
             if (CI.equals(s) || CIR.equals(s)) {
-                callbackInfoIndex = i + 1;
+                callbackInfoIndex = i;
                 break;
             }
         }
+        if (!method.isStatic()) callbackInfoIndex++;
 
         // Visit mixin method annotation
         mv = cw.visitMethod(Opcodes.ACC_PRIVATE | (method.isStatic() ? Opcodes.ACC_STATIC : 0), handlerName,
@@ -111,12 +112,16 @@ public class MixinClassGenerator {
                 mv.visitInsn(Opcodes.ACONST_NULL);
             }
             // thisObject
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
+            if (method.isStatic()) {
+                mv.visitInsn(Opcodes.ACONST_NULL);
+            } else {
+                mv.visitVarInsn(Opcodes.ALOAD, 0);
+            }
             // args
-            visitMutableInt(mv, injector.hasCI() ? paramsCount : paramsCount + 1);
+            visitMutableInt(mv, paramsCount);
             mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
-            if (paramsCount != 0) {
-                visitParamsArray(mv, params);
+            if (paramsCount != 1) {
+                visitParamsArray(mv, params, method.isStatic());
             }
             // call runScript
             if (withReturn) {
@@ -129,14 +134,13 @@ public class MixinClassGenerator {
             mv.visitInsn(withReturn ? Opcodes.ARETURN : Opcodes.RETURN);
             Label label2 = new Label();
             mv.visitLabel(label2);
-            mv.visitLocalVariable("this", strRef2desc(thisClass), null, label0, label2, 0);
-            // Load method params
-            for (int i = 1; i < params.size(); i++) {
-                mv.visitLocalVariable("arg" + i, params.get(i), null, label0, label2, i);
+            if (!method.isStatic()) {
+                mv.visitLocalVariable("this", strRef2desc(thisClass), null, label0, label2, 0);
             }
-            if (injector.hasCI()) {
-                // Load ci, don't worry about CallbackInfoReturnable, as Mixin will automatically cast it
-                mv.visitLocalVariable("ci", CI, null, label0, label2, callbackInfoIndex);
+            // Load method params
+            int startIndex = method.isStatic() ? 0 : 1;
+            for (int i = startIndex; i < params.size(); i++) {
+                mv.visitLocalVariable("arg" + i, params.get(i), null, label0, label2, i);
             }
             mv.visitMaxs(0, 0); // ignored
             mv.visitEnd();
@@ -156,21 +160,22 @@ public class MixinClassGenerator {
         }
     }
 
-    private static void visitParamsArray(MethodVisitor mv, List<String> params) {
+    private static void visitParamsArray(MethodVisitor mv, List<String> params, boolean isStatic) {
         // include CallbackInfo in order to capture locals
         for (int i = 0; i < params.size(); i++) {
             String p = params.get(i);
             Type type = Type.getType(p);
             mv.visitInsn(Opcodes.DUP);
             visitMutableInt(mv, i);
+            int index = isStatic ? i : i + 1;
             if (type.getSort() != Type.OBJECT) {
-                mv.visitVarInsn(type.getOpcode(Opcodes.ILOAD), i + 1);
+                mv.visitVarInsn(type.getOpcode(Opcodes.ILOAD), index);
                 String wrapper = desc2ref(Utils.primitiveToWrapper(p));
                 mv.visitMethodInsn(Opcodes.INVOKESTATIC, wrapper, "valueOf",
                         "(" + p + ")" + Utils.primitiveToWrapper(p),
                         false);
             } else {
-                mv.visitVarInsn(Opcodes.ALOAD, i + 1);
+                mv.visitVarInsn(Opcodes.ALOAD, index);
             }
             mv.visitInsn(Opcodes.AASTORE);
         }
