@@ -1,2 +1,2 @@
 # MixinJs
-Supports [Mixin](https://github.com/SpongePowered/Mixin) For KubeJs!
+Let [KubeJS](https://github.com/KubeJS-Mods/KubeJS) use [Mixin](https://github.com/SpongePowered/Mixin) for developing!

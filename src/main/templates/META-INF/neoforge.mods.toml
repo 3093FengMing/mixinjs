@@ -41,8 +41,8 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies."${mod_id}"]]
-modId = "rhino"
+modId = "kubejs"
 type = "required"
-versionRange = "${rhino_version_range}"
-ordering = "AFTER"
+versionRange = "${kubejs_version_range}"
+ordering = "NONE"
 side = "BOTH"
