@@ -79,7 +79,6 @@ public class MixinScriptManager {
             if (!kubeJsLoaded) {
                 kubeJsLoaded = Utils.getLoadedClasses().stream().anyMatch(s -> s.startsWith("dev.latvian.mods.kubejs"));
             }
-            MixinJs.LOGGER.info("kubeJsLoaded: {}", kubeJsLoaded);
             if (!kubeJsLoaded) {
                 MixinJs.LOGGER.error("Script {} attempted to run when KubeJs was not loaded, skipped.", handlerName);
                 return null;
@@ -88,7 +87,6 @@ public class MixinScriptManager {
                 defaultContext = kubeContext;
                 addBindings(defaultContext, kubeContext.topLevelScope, true);
                 defaultContext.setTopCall(kubeContext.topLevelScope);
-                MixinJs.LOGGER.info("defaultContext: {}", defaultContext);
             }
         }
         try {
