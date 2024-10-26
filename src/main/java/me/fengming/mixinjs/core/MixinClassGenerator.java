@@ -2,6 +2,7 @@ package me.fengming.mixinjs.core;
 
 import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
+import me.fengming.mixinjs.script.js.AtJS;
 import me.fengming.mixinjs.script.js.InjectorJS;
 import me.fengming.mixinjs.script.js.MixinBuilderJS;
 import me.fengming.mixinjs.script.js.MixinMethod;
@@ -84,12 +85,12 @@ public class MixinClassGenerator {
                 if (injector.isMultiAt()) {
                     av2 = av0.visitArray("at");
                     av1 = av2.visitAnnotation(null, "Lorg/spongepowered/asm/mixin/injection/At;");
-                    injector.at.visit(av1);
+                    visitAt(injector.at, av1);
                     av1.visitEnd();
                     av2.visitEnd();
                 } else {
                     av1 = av0.visitAnnotation("at", "Lorg/spongepowered/asm/mixin/injection/At;");
-                    injector.at.visit(av1);
+                    visitAt(injector.at, av1);
                     av1.visitEnd();
                 }
             }
@@ -185,6 +186,13 @@ public class MixinClassGenerator {
 
     private static String desc2ref(String desc) {
         return desc.substring(1, desc.length() - 1);
+    }
+
+    public static void visitAt(AtJS at, AnnotationVisitor av) {
+        av.visit("value", at.value);
+        if (at.target != null) {
+            av.visit("target", at.target);
+        }
     }
 
 }

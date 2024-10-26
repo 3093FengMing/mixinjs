@@ -1,7 +1,5 @@
 package me.fengming.mixinjs.script.js;
 
-import org.objectweb.asm.AnnotationVisitor;
-
 @SuppressWarnings("unused")
 public class AtJS {
     public static final AtJS HEAD = new AtJS("HEAD");
@@ -25,13 +23,6 @@ public class AtJS {
     public AtJS target(String target) {
         this.target = target;
         return this;
-    }
-
-    public void visit(AnnotationVisitor av) {
-        av.visit("value", value);
-        if (target != null) {
-            av.visit("target", target);
-        }
     }
 
 }
