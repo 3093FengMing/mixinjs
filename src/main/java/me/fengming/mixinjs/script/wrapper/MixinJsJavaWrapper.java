@@ -8,7 +8,7 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public class MixinJsJavaWrapper {
-    public static MixinJsJavaWrapper INSTANCE;
+    private static MixinJsJavaWrapper INSTANCE;
 
     private final Map<String, NativeJavaClass> classCache = new HashMap<>();
     private final Context context;
@@ -26,7 +26,7 @@ public class MixinJsJavaWrapper {
         return clazz;
     }
 
-    public static void init(Context context) {
-        INSTANCE = new MixinJsJavaWrapper(context);
+    public static MixinJsJavaWrapper getInstanceForContext(Context context) {
+        return new MixinJsJavaWrapper(context);
     }
 }

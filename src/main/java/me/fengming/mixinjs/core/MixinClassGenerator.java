@@ -2,7 +2,6 @@ package me.fengming.mixinjs.core;
 
 import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.Utils;
-import me.fengming.mixinjs.script.js.AtJS;
 import me.fengming.mixinjs.script.js.InjectorJS;
 import me.fengming.mixinjs.script.js.MixinBuilderJS;
 import me.fengming.mixinjs.script.js.MixinMethod;
@@ -68,8 +67,7 @@ public class MixinClassGenerator {
         if (!method.isStatic()) callbackInfoIndex++;
 
         // Visit mixin method annotation
-        mv = cw.visitMethod(Opcodes.ACC_PRIVATE | (method.isStatic() ? Opcodes.ACC_STATIC : 0), handlerName,
-                method.desc(), null, null);
+        mv = cw.visitMethod(Opcodes.ACC_PRIVATE | (method.isStatic() ? Opcodes.ACC_STATIC : 0), handlerName, method.desc(), null, null);
         {
             {
                 av0 = mv.visitAnnotation(strRef2desc(Utils.rawPackage(annotationType)), true);
@@ -86,12 +84,12 @@ public class MixinClassGenerator {
                 if (injector.isMultiAt()) {
                     av2 = av0.visitArray("at");
                     av1 = av2.visitAnnotation(null, "Lorg/spongepowered/asm/mixin/injection/At;");
-                    visitAt(injector.at, av1);
+                    injector.at.visit(av1);
                     av1.visitEnd();
                     av2.visitEnd();
                 } else {
                     av1 = av0.visitAnnotation("at", "Lorg/spongepowered/asm/mixin/injection/At;");
-                    visitAt(injector.at, av1);
+                    injector.at.visit(av1);
                     av1.visitEnd();
                 }
             }
@@ -178,13 +176,6 @@ public class MixinClassGenerator {
                 mv.visitVarInsn(Opcodes.ALOAD, index);
             }
             mv.visitInsn(Opcodes.AASTORE);
-        }
-    }
-
-    private static void visitAt(AtJS at, AnnotationVisitor av) {
-        av.visit("value", at.value);
-        if (at.target != null) {
-            av.visit("target", at.target);
         }
     }
 

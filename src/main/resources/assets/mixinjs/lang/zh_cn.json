@@ -1,0 +1,4 @@
+{
+  "commands.mixinjs.reload.success": "已重载MixinJs脚本文件！",
+  "commands.mixinjs.reload.error": "在重载MixinJs脚本文件时出错，请查看日志！"
+}

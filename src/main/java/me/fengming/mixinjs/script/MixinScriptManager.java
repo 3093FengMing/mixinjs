@@ -4,7 +4,6 @@ import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.ContextFactory;
-import dev.latvian.mods.rhino.NativeJavaArray;
 import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import me.fengming.mixinjs.MixinJs;
@@ -31,22 +30,23 @@ public class MixinScriptManager {
     protected static Context defaultContext;
     protected static Scriptable defaultScope;
 
-    private static boolean kubeLoaded = false;
+    private static boolean kubeJsLoaded = false;
     private static final HashMap<String, MixinHandler<?>> handlers = new HashMap<>();
 
     public static void load() {
         // script manager
         defaultContext = new ContextFactory().enter();
         defaultScope = defaultContext.initSafeStandardObjects();
-        addBindings(defaultContext, defaultScope);
+        addBindings(defaultContext, defaultScope, false);
         // scripts
         InjectorJS.load();
     }
 
-    public static void addBindings(Context context, Scriptable scope) {
-        MixinJsJavaWrapper.init(context);
-        context.addToScope(scope, "Logger", MixinJs.LOGGER);
-        context.addToScope(scope, "JavaWrapper", MixinJsJavaWrapper.INSTANCE);
+    public static void addBindings(Context context, Scriptable scope, boolean noJavaWrapper) {
+        if (!noJavaWrapper) {
+            context.addToScope(scope, "JavaWrapper", MixinJsJavaWrapper.getInstanceForContext(context));
+        }
+        context.addToScope(scope, "MixinJsLogger", MixinJs.LOGGER);
         context.addToScope(scope, "Mixins", MixinsJS.class);
         context.addToScope(scope, "Injector", InjectorJS.class);
         context.addToScope(scope, "At", AtJS.class);
@@ -76,15 +76,19 @@ public class MixinScriptManager {
         }
         // be sure call by KubeJs
         if (MixinJs.isForceKubeJsLoad) {
-            if (!kubeLoaded) {
-                kubeLoaded = Utils.getLoadedClasses().stream().anyMatch(s -> s.startsWith("dev.latvian.mods.kubejs"));
+            if (!kubeJsLoaded) {
+                kubeJsLoaded = Utils.getLoadedClasses().stream().anyMatch(s -> s.startsWith("dev.latvian.mods.kubejs"));
             }
-            if (!kubeLoaded) {
+            MixinJs.LOGGER.info("kubeJsLoaded: {}", kubeJsLoaded);
+            if (!kubeJsLoaded) {
                 MixinJs.LOGGER.error("Script {} attempted to run when KubeJs was not loaded, skipped.", handlerName);
                 return null;
             } else {
                 KubeJSContext kubeContext = (KubeJSContext) KubeJS.getStartupScriptManager().contextFactory.enter();
+                defaultContext = kubeContext;
+                addBindings(defaultContext, kubeContext.topLevelScope, true);
                 defaultContext.setTopCall(kubeContext.topLevelScope);
+                MixinJs.LOGGER.info("defaultContext: {}", defaultContext);
             }
         }
         try {
@@ -95,8 +99,8 @@ public class MixinScriptManager {
         return null;
     }
 
-    public static MixinHandler<?> addHandler(String handlerName, MixinHandler<?> handler) {
-        return handlers.put(handlerName, handler);
+    public static void addHandler(String handlerName, MixinHandler<?> handler) {
+        handlers.put(handlerName, handler);
     }
 
     public static MixinHandler<?> getHandler(String handlerName) {
