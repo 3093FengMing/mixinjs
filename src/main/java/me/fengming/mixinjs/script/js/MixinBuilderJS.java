@@ -1,5 +1,6 @@
 package me.fengming.mixinjs.script.js;
 
+import dev.latvian.mods.rhino.ArrowFunction;
 import me.fengming.mixinjs.MixinJs;
 import me.fengming.mixinjs.core.MixinClassGenerator;
 import me.fengming.mixinjs.script.MixinScriptManager;
@@ -20,8 +21,10 @@ public class MixinBuilderJS {
         this.target = target;
     }
 
-    public MixinBuilderJS method(String target, InjectorJS injector, MixinHandler<?> handler, String desc, boolean isStatic) {
-        methods.add(new MixinMethod(target, injector, handler, desc, isStatic));
+    public MixinBuilderJS method(String target, InjectorJS injector, ArrowFunction handler, String desc, boolean isStatic) {
+        methods.add(new MixinMethod(target, injector, desc, isStatic,
+                (context, scope, thisObject, ci, args) -> handler.call(context, scope, null, new Object[]{thisObject, ci, args}))
+        );
         return this;
     }
 

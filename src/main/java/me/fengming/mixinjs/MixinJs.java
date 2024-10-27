@@ -14,7 +14,6 @@ public class MixinJs {
     public static final String MODID = "mixinjs";
     public static final Logger LOGGER = LoggerFactory.getLogger("MixinJs");
 
-    public static boolean isForceKubeJsLoad = false;
     public static MixinJsConfig config = null;
 
     public MixinJs() {

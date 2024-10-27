@@ -20,6 +20,9 @@ public class MixinJsConfig {
     @SerializedName("refmap")
     private String refmap;
 
+    @SerializedName("forceKubeJsLoad")
+    private boolean forceKubeJsLoad;
+
     @SerializedName("mixins")
     private List<String> mixins;
 
@@ -80,5 +83,9 @@ public class MixinJsConfig {
         StringBuilder sb = new StringBuilder("[");
         list.forEach(s -> sb.append("\"").append(s).append("\", "));
         return sb.delete(sb.length() - 2, sb.length()).append("]").toString();
+    }
+
+    public boolean isForceKubeJsLoad() {
+        return this.forceKubeJsLoad;
     }
 }
