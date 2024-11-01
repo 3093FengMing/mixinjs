@@ -108,6 +108,8 @@ tasks.register("buildCoreMod") {
         exclude "assets"
         exclude "template.generated.mixins.json"
         exclude "mixinjs.mixins.json"
+        exclude "kubejs.plugins.txt"
+        exclude "icon.png"
         exclude "META-INF/MANIFEST.MF"
         exclude "META-INF/neoforge.mods.toml"
         archiveBaseName = "mixinjs-coremod"
