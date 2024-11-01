@@ -20,11 +20,11 @@ public class MixinJsConfig {
     @SerializedName("refmap")
     private String refmap;
 
-    @SerializedName("forceKubeJsLoad")
-    private boolean forceKubeJsLoad;
-
     @SerializedName("mixins")
     private List<String> mixins;
+
+    @SerializedName("forceKubeJsLoad")
+    private boolean forceKubeJsLoad;
 
     private final List<String> serverMixinClasses = new ArrayList<>();
     private final List<String> clientMixinClasses = new ArrayList<>();
@@ -77,9 +77,7 @@ public class MixinJsConfig {
     }
 
     private static String mixinsToString(List<String> list) {
-        if (list.isEmpty()) {
-            return "[]";
-        }
+        if (list.isEmpty()) return "[]";
         StringBuilder sb = new StringBuilder("[");
         list.forEach(s -> sb.append("\"").append(s).append("\", "));
         return sb.delete(sb.length() - 2, sb.length()).append("]").toString();

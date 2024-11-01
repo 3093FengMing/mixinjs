@@ -14,13 +14,14 @@ public class MixinJsConnector implements IMixinConnector {
     public void connect() {
         MixinJs.LOGGER.info("[MixinJsConnector] Connected to Mixin.");
         if (Files.notExists(Utils.configPath)) {
-            MixinJs.LOGGER.error("[MixinJs] Failed to find mixin config file!");
+            MixinJs.LOGGER.error("[MixinJs] Not found mixin config file!");
             return;
         }
         // Load configs
         MixinJs.config = MixinJsConfig.create("mixins.config.json");
         MixinJs.config.load();
         MixinJs.config.writeMixinConfig();
+
         Mixins.addConfiguration(Utils.mixinConfigPath.toString());
     }
 }

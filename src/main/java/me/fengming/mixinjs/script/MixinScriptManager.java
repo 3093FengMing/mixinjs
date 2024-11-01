@@ -42,10 +42,10 @@ public class MixinScriptManager {
     }
 
     public static void addBindings(Context context, Scriptable scope, boolean kubeJavaWrapper) {
-        if (!kubeJavaWrapper) {
-            context.addToScope(scope, "JavaWrapper", MixinJsJavaWrapper.class);
-        } else {
+        if (kubeJavaWrapper) {
             context.addToScope(scope, "JavaWrapper", JavaWrapper.class);
+        } else {
+            context.addToScope(scope, "JavaWrapper", MixinJsJavaWrapper.class);
         }
         context.addToScope(scope, "MixinJsLogger", MixinJs.LOGGER);
         context.addToScope(scope, "Mixins", MixinsJS.class);
@@ -75,7 +75,7 @@ public class MixinScriptManager {
             return null;
         }
         // be sure call by KubeJs
-        if (MixinJs.config.isForceKubeJsLoad()) {
+        if (!kubeJsLoaded && MixinJs.config.isForceKubeJsLoad()) {
             if (!isKubeJsLoaded()) {
                 MixinJs.LOGGER.error("Script {} attempted to run when KubeJS was not loaded, skipped.", handlerName);
                 return null;
@@ -88,13 +88,17 @@ public class MixinScriptManager {
                 defaultScope = kubeScriptManager.topScope;
                 defaultContext.setTopCall(defaultScope);
                 addBindings(defaultContext, defaultScope, true);
+                kubeJsLoaded = true;
             }
         }
-        // MixinJs.LOGGER.info("pi:{}", Arrays.toString(defaultScope.getAllIds(defaultContext)));
 
         NativeJavaArray methodArgs = (NativeJavaArray) defaultContext.wrap(defaultScope, args, TypeInfo.OBJECT_ARRAY);
         try {
-            return handler.handle(defaultContext, defaultScope, thisObject, ci, methodArgs);
+            Object obj = handler.handle(defaultContext, defaultScope, thisObject, ci, methodArgs);
+            if (obj instanceof NativeJavaObject nativeObj) {
+                return nativeObj.unwrap();
+            }
+            return obj;
         } catch (Throwable e) {
             MixinJs.LOGGER.error("Failed to handle {}: ", handlerName, e);
         }

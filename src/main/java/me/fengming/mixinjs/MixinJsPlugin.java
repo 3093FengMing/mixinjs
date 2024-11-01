@@ -22,6 +22,8 @@ public class MixinJsPlugin implements KubeJSPlugin {
 
     @Override
     public void initStartup() {
-        MixinScriptManager.loadScript();
+        if (MixinJs.config.isForceKubeJsLoad()) {
+            MixinScriptManager.loadScript();
+        }
     }
 }

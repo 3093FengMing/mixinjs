@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("deprecation")
 public class MixinJsTransformationService implements ITransformationService {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("MixinJsCoreMod");
@@ -44,6 +45,14 @@ public class MixinJsTransformationService implements ITransformationService {
         // hacky
         patchMixinConfig();
         patchMixinInfo();
+    }
+
+    private ClassNode getInjectorNode() {
+        ClassNode cn = new ClassNode();
+        // ClassReader cr = new ClassReader(MixinInfoInjector.class.getName());
+        ClassReader cr = new ClassReader(injectorBytes);
+        cr.accept(cn, ClassReader.SKIP_DEBUG);
+        return cn;
     }
 
     private void patchMixinConfig() {
@@ -99,9 +108,7 @@ public class MixinJsTransformationService implements ITransformationService {
             cr.accept(clazz, ClassReader.SKIP_FRAMES);
 
             // add method
-            ClassNode injectNode = new ClassNode();
-            ClassReader injectReader = new ClassReader(injectorBytes);
-            injectReader.accept(injectNode, ClassReader.SKIP_FRAMES);
+            ClassNode injectNode = getInjectorNode();
             injectNode.methods.stream().filter(m -> m.name.equals("getMixinClassNode")).forEach(clazz.methods::add);
 
             MethodNode method = clazz.methods.stream()
