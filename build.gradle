@@ -19,7 +19,7 @@ repositories {
 }
 
 base {
-    archivesName = mod_id
+    archivesName = mod_id + "-main"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -112,7 +112,7 @@ tasks.register("buildCoreMod") {
         exclude "icon.png"
         exclude "META-INF/MANIFEST.MF"
         exclude "META-INF/neoforge.mods.toml"
-        archiveBaseName = "mixinjs-coremod"
+        archiveBaseName = "mixinjs"
     }
 }
 
@@ -120,6 +120,7 @@ tasks.register("buildMain") {
     group "build"
     dependsOn build
     jar {
+        archiveFileName = "mixinjs-main.jar"
         exclude "me/fengming/mixinjs_coremod"
         exclude "META-INF/services"
         manifest.attributes(

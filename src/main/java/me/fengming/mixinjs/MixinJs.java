@@ -17,7 +17,6 @@ public class MixinJs {
     public static MixinJsConfig config = null;
 
     public MixinJs() {
-
     }
 
     @EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME)
